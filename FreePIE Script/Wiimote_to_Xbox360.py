@@ -1,9 +1,11 @@
-#Created by ElliotGamer3
+#	Script Created by ElliotGamer3
 #	
 #	This file contains wiimote to xoutput definitions
 #	Created by Elliot Imhoff
-#	Credit where due to creators of XOutputPlugin
-#
+#	Credit where due to creators of XOutputPlugin and FreePIE
+#	XOutputPlugin: https://github.com/dschu012/XOutputPlugin
+#	FreePie: https://github.com/AndersMalmgren/FreePIE
+#	
 # Uses XOutputPlugin to map multiple wiimotes to xbox virtual remotes
 # Detects accessory changes to wiimotes and updates mappings accordingly
 # Currently detects and has maps for:
@@ -31,6 +33,7 @@
 
 POLLING_PERIOD 	= 1
 MAX_PLAYERS = 4
+
 GUITAR_EXTENSION = 3
 NUNCHUCK_EXTENSION = 2
 NO_EXTENSION = 1
@@ -68,23 +71,53 @@ def update_player_type():
 def led_toggle(player_number, led_number):
 	wiimote[player_number].status.setLEDState(led_number, not(wiimote[player_number].status.getLEDState(led_number)))
 
+#########################
+# Wiimote Button Binder #
+#########################
+
+def wButton_xButton(wiimote_num, xoutput_num, wButton, xButton):
+	xoutput[xoutput_num].setButton(xButton, wiimote[wiimote_num].buttons.button_down(wButton))
+
+def wButton_xButton(remote_num, wButton, xButton):
+	xoutput[remote_num].setButton(xButton, wiimote[remote_num].buttons.button_down(wButton))
+
+##########################
+# Nunchuck Button Binder #
+##########################
+
+def nButton_xButton(wiimote_num, xoutput_num, nButton, xButton):
+	xoutput[xoutput_num].setButton(xButton, wiimote[wiimote_num].nunchuck.buttons.button_down(nButton))
+
+def nButton_xButton(remote_num, nButton, xButton):
+	xoutput[remote_num].setButton(xButton, wiimote[remote_num].nunchuck.buttons.button_down(nButton))
+
+########################
+# Guitar Button Binder #
+########################
+
+def gButton_xButton(wiimote_num, xoutput_num, gButton, xButton):
+	xoutput[xoutput_num].setButton(xButton, wiimote[wiimote_num].guitar.buttons.button_down(gButton))
+
+def gButton_xButton(remote_num, gButton, xButton):
+	xoutput[remote_num].setButton(xButton, wiimote[remote_num].guitar.buttons.button_down(gButton))
+
 ####################
 # Wiimote mappings #
 ####################
 
-def map_wiimote(n):
-	xoutput[n].setButton(XOutputButton.A, wiimote[n].buttons.button_down(WiimoteButtons.A))
-	xoutput[n].setButton(XOutputButton.B, wiimote[n].buttons.button_down(WiimoteButtons.B))
-	xoutput[n].setButton(XOutputButton.X, wiimote[n].buttons.button_down(WiimoteButtons.One))
-	xoutput[n].setButton(XOutputButton.Y, wiimote[n].buttons.button_down(WiimoteButtons.Two))
-
-	xoutput[n].setButton(XOutputButton.Back, wiimote[n].buttons.button_down(WiimoteButtons.Plus))
-	xoutput[n].setButton(XOutputButton.Start, wiimote[n].buttons.button_down(WiimoteButtons.Minus))
+def map_wiimote(n):	
+	wButton_xButton(n, WiimoteButtons.A, XOutputButton.A)
+	wButton_xButton(n, WiimoteButtons.B, XOutputButton.B)
+	wButton_xButton(n, WiimoteButtons.One, XOutputButton.X)
+	wButton_xButton(n, WiimoteButtons.Two, XOutputButton.Y)
 	
-	xoutput[n].setButton(XOutputButton.Up, wiimote[n].buttons.button_down(WiimoteButtons.DPadUp))
-	xoutput[n].setButton(XOutputButton.Right, wiimote[n].buttons.button_down(WiimoteButtons.DPadRight))
-	xoutput[n].setButton(XOutputButton.Down, wiimote[n].buttons.button_down(WiimoteButtons.DPadDown))
-	xoutput[n].setButton(XOutputButton.Left, wiimote[n].buttons.button_down(WiimoteButtons.DPadLeft))
+	wButton_xButton(n, WiimoteButtons.Plus, XOutputButton.Back)
+	wButton_xButton(n, WiimoteButtons.Minus, XOutputButton.Start)
+	
+	wButton_xButton(n, WiimoteButtons.DPadUp, XOutputButton.Up)
+	wButton_xButton(n, WiimoteButtons.DPadRight, XOutputButton.Right)
+	wButton_xButton(n, WiimoteButtons.DPadDown, XOutputButton.Down)
+	wButton_xButton(n, WiimoteButtons.DPadLeft, XOutputButton.Left)
 
 #####################
 # Nunchuck mappings #
@@ -92,8 +125,8 @@ def map_wiimote(n):
 
 #TODO::Test mapping for nunchuck stick
 def map_wiimote_nunchuck(n):
-	xoutput[n].setButton(XOutputButton.L1, wiimote[n].nunchuck.buttons.button_down(NunchuckButtons.C))
-	xoutput[n].setButton(XOutputButton.R1, wiimote[n].nunchuck.buttons.button_down(NunchuckButtons.Z))
+	nButton_xButton(n, NunchuckButtons.C, XOutputButton.L1)
+	nButton_xButton(n, NunchuckButtons.Z, XOutputButton.R1)
 	xoutput[n].lx = wiimote[n].nunchuck.stick.x
 	xoutput[n].ly = wiimote[n].nunchuck.stick.y
 
@@ -103,17 +136,17 @@ def map_wiimote_nunchuck(n):
 
 #TODO::Test mapping for guitars
 def map_wiimote_Guitar(n):
-	xoutput[n].setButton(XOutputButton.A, wiimote[n].guitar.buttons.button_down(GuitarButtons.Green))
-	xoutput[n].setButton(XOutputButton.B, wiimote[n].guitar.buttons.button_down(GuitarButtons.Red))
-	xoutput[n].setButton(XOutputButton.Y, wiimote[n].guitar.buttons.button_down(GuitarButtons.Yellow))
-	xoutput[n].setButton(XOutputButton.X, wiimote[n].guitar.buttons.button_down(GuitarButtons.Blue))
-	xoutput[n].setButton(XOutputButton.R1, wiimote[n].guitar.buttons.button_down(GuitarButtons.Orange))
+	gButton_xButton(n, GuitarButtons.Green, XOutputButton.A)
+	gButton_xButton(n, GuitarButtons.Red, XOutputButton.B)
+	gButton_xButton(n, GuitarButtons.Yellow, XOutputButton.X)
+	gButton_xButton(n, GuitarButtons.Blue, XOutputButton.Y)
+	gButton_xButton(n, GuitarButtons.Orange, XOutputButton.R1)
 	
-	xoutput[n].setButton(XOutputButton.Back, wiimote[n].guitar.buttons.button_down(GuitarButtons.Minus))
-	xoutput[n].setButton(XOutputButton.Start, wiimote[n].guitar.buttons.button_down(GuitarButtons.Plus))
+	gButton_xButton(n, GuitarButtons.Minus, XOutputButton.Back)
+	gButton_xButton(n, GuitarButtons.Plus, XOutputButton.Start)
 	
-	xoutput[n].setButton(XOutputButton.Up, wiimote[n].guitar.buttons.button_down(GuitarButtons.StrumUp))
-	xoutput[n].setButton(XOutputButton.Down, wiimote[n].guitar.buttons.button_down(GuitarButtons.StrumDown))
+	gButton_xButton(n, GuitarButtons.StrumUp, XOutputButton.Up)
+	gButton_xButton(n, GuitarButtons.StrumDown, XOutputButton.Down)
 
 ###################
 # Wiimote updates #
